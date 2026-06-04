@@ -55,7 +55,7 @@ import PaHome from "./admin/PaHome";
 import MinisterReadOnly from "./admin/MinisterReadOnly";
 import { type Language, tAdmin } from "@/lib/i18n";
 import { useLeaderConfig, lc } from "@/lib/LeaderConfigContext";
-import { Crown } from "lucide-react";
+import { Crown, Languages } from "lucide-react";
 import { UnsavedChangesProvider, useConfirmDiscard } from "@/lib/unsavedChanges";
 
 interface AdminProps { lang?: Language; setLang?: (l: Language) => void }
@@ -562,8 +562,19 @@ function AdminInner({ lang = "ta", setLang }: AdminProps) {
               <h1 className="font-semibold text-sm text-gray-900">{currentItem.label}</h1>
             </div>
           )}
-          <div className="ml-auto">
+          <div className="ml-auto flex items-center gap-3">
             <span className="text-xs text-muted-foreground hidden sm:inline">{leader.constituencyEn} Constituency</span>
+            {setLang && (
+              <button
+                onClick={() => setLang(lang === "en" ? "ta" : "en")}
+                data-testid="admin-lang-toggle"
+                title={lang === "en" ? "தமிழுக்கு மாற்று" : "Switch to English"}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-gray-200 text-xs font-medium text-gray-700 hover:bg-gray-100 transition-colors"
+              >
+                <Languages className="w-4 h-4" />
+                {lang === "en" ? "தமிழ்" : "English"}
+              </button>
+            )}
           </div>
         </header>
 

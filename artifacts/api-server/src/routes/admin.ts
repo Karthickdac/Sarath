@@ -2743,6 +2743,95 @@ router.get("/admin/appointments/:id", requireRole(...APPT_READ_ROLES), async (re
   }
 });
 
+function genApptTicket(): string {
+  const year = new Date().getFullYear();
+  const rand = String(Math.floor(Math.random() * 90000) + 10000);
+  return `APT-${year}-${rand}`;
+}
+
+const AppointmentCreateBody = z.object({
+  name: z.string().min(1).max(200),
+  phone: z.string().min(1).max(40),
+  email: z.string().max(200).optional().nullable(),
+  address: z.string().max(2000).optional().nullable(),
+  ward: z.string().max(200).optional().nullable(),
+  category: z.enum(APPOINTMENT_CATEGORIES).optional(),
+  subject: z.string().min(1).max(500),
+  description: z.string().max(5000).optional().nullable(),
+  partySize: z.number().int().min(1).max(1000).optional(),
+  preferredDate: z.string().optional().nullable(),
+  preferredTime: z.string().optional().nullable(),
+  alternateDate: z.string().optional().nullable(),
+  scheduledDate: z.string().optional().nullable(),
+  scheduledTime: z.string().optional().nullable(),
+  location: z.string().max(500).optional().nullable(),
+  status: z.enum(APPOINTMENT_STATUSES).optional(),
+});
+
+// POST /api/admin/appointments — staff books on behalf of a citizen (e.g. phone-in)
+router.post("/admin/appointments", requireRole(...APPT_MANAGE_ROLES), async (req: AuthRequest, res) => {
+  try {
+    const body = AppointmentCreateBody.safeParse(req.body);
+    if (!body.success) { res.status(400).json({ error: "Invalid request", details: body.error.issues }); return; }
+    const d = body.data;
+
+    const toDate = (s: string | null | undefined): Date | null | "INVALID" => {
+      if (s === undefined || s === null || s === "") return null;
+      const dt = new Date(s);
+      return Number.isNaN(dt.getTime()) ? "INVALID" : dt;
+    };
+    const preferredDate = toDate(d.preferredDate);
+    if (preferredDate === "INVALID") { res.status(400).json({ error: "Invalid preferredDate" }); return; }
+    const alternateDate = toDate(d.alternateDate);
+    if (alternateDate === "INVALID") { res.status(400).json({ error: "Invalid alternateDate" }); return; }
+    const scheduledDate = toDate(d.scheduledDate);
+    if (scheduledDate === "INVALID") { res.status(400).json({ error: "Invalid scheduledDate" }); return; }
+
+    let ticketNo = genApptTicket();
+    const existing = await db.select({ id: appointmentsTable.id }).from(appointmentsTable)
+      .where(eq(appointmentsTable.ticketNo, ticketNo)).limit(1);
+    if (existing.length > 0) ticketNo = genApptTicket();
+
+    const status = d.status ?? "Pending";
+    const scheduledStatus = status === "Approved" || status === "Rescheduled" || status === "Completed";
+
+    const [appointment] = await db.insert(appointmentsTable).values({
+      ticketNo,
+      name: d.name,
+      phone: d.phone,
+      email: d.email ?? null,
+      address: d.address ?? null,
+      ward: d.ward ?? null,
+      category: d.category ?? "General",
+      subject: d.subject,
+      description: d.description ?? null,
+      partySize: d.partySize ?? 1,
+      preferredDate,
+      preferredTime: d.preferredTime ?? null,
+      alternateDate,
+      scheduledDate,
+      scheduledTime: d.scheduledTime ?? null,
+      location: d.location ?? null,
+      status,
+      handledBy: scheduledStatus ? (req.user?.id ?? null) : null,
+      handledByName: scheduledStatus ? (req.user?.name ?? null) : null,
+      completedAt: status === "Completed" ? new Date() : null,
+    }).returning();
+
+    await logAudit(req, "appointment:create", `appointment#${appointment.id} (${appointment.ticketNo})`, undefined);
+
+    res.status(201).json(serializeAppointment(appointment));
+
+    // Async AI priority scoring — fire-and-forget
+    setImmediate(() => {
+      import("./ai.js").then(({ scoreAppointment }) => scoreAppointment(appointment.id)).catch(() => {});
+    });
+  } catch (err) {
+    console.error("[admin] appointment create:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 const AppointmentPatchBody = z.object({
   status: z.enum(APPOINTMENT_STATUSES).optional(),
   category: z.enum(APPOINTMENT_CATEGORIES).optional(),

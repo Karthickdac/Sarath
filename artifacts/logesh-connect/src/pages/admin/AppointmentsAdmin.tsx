@@ -10,7 +10,7 @@ import {
   CalendarCheck, Search, Download, X, ChevronLeft, ChevronRight,
   Clock, CheckCircle, CalendarClock, CheckCheck, XCircle, RotateCcw,
   Phone, Mail, MapPin, Users as UsersIcon, Loader2, Trash2, List, CalendarDays,
-  Sparkles, Pencil,
+  Sparkles, Pencil, Plus,
 } from "lucide-react";
 import type { Language } from "@/lib/i18n";
 
@@ -60,6 +60,7 @@ const STATUS_META: Record<string, { ta: string; cls: string; icon: typeof Clock 
 export default function AppointmentsAdmin({ lang, role }: AppointmentsAdminProps) {
   const readOnly = role === "minister";
   const canDelete = role === "super_admin";
+  const canCreate = ["super_admin", "admin", "pa_staff"].includes(role);
   const lc = (en: string, ta: string) => (lang === "ta" ? ta : en);
 
   const [view, setView] = useState<"list" | "calendar">("list");
@@ -75,6 +76,7 @@ export default function AppointmentsAdmin({ lang, role }: AppointmentsAdminProps
   const [qDebounced, setQDebounced] = useState("");
 
   const [selected, setSelected] = useState<Appointment | null>(null);
+  const [creating, setCreating] = useState(false);
   const [calMonth, setCalMonth] = useState(() => { const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); return d; });
   const [calItems, setCalItems] = useState<Appointment[]>([]);
 
@@ -167,6 +169,11 @@ export default function AppointmentsAdmin({ lang, role }: AppointmentsAdminProps
           <Button variant="outline" size="sm" onClick={handleExport} data-testid="button-export-appointments">
             <Download className="w-4 h-4 mr-1.5" />{lc("CSV", "CSV")}
           </Button>
+          {canCreate && (
+            <Button size="sm" onClick={() => setCreating(true)} data-testid="button-new-appointment">
+              <Plus className="w-4 h-4 mr-1.5" />{lc("Book Appointment", "சந்திப்பு பதிவு")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -292,6 +299,14 @@ export default function AppointmentsAdmin({ lang, role }: AppointmentsAdminProps
             setSelected(null);
             refreshAfterMutation();
           }}
+        />
+      )}
+
+      {creating && (
+        <CreateAppointmentDrawer
+          lang={lang}
+          onClose={() => setCreating(false)}
+          onCreated={() => { setCreating(false); refreshAfterMutation(); }}
         />
       )}
     </div>
@@ -677,6 +692,177 @@ function AppointmentDrawer({ lang, readOnly, canDelete, appointment, onClose, on
               {busy && <div className="flex justify-center"><Loader2 className="w-4 h-4 animate-spin" /></div>}
             </div>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Create drawer — staff books an appointment on behalf of a citizen ──
+function CreateAppointmentDrawer({ lang, onClose, onCreated }: {
+  lang: Language; onClose: () => void; onCreated: () => void;
+}) {
+  const lc = (en: string, ta: string) => (lang === "ta" ? ta : en);
+
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [ward, setWard] = useState("");
+  const [address, setAddress] = useState("");
+  const [category, setCategory] = useState("General");
+  const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
+  const [partySize, setPartySize] = useState("1");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [preferredTime, setPreferredTime] = useState("");
+  const [alternateDate, setAlternateDate] = useState("");
+  const [scheduledDate, setScheduledDate] = useState("");
+  const [scheduledTime, setScheduledTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [status, setStatus] = useState("Pending");
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
+
+  async function submit() {
+    if (!name.trim() || !phone.trim() || !subject.trim()) {
+      setErr(lc("Name, phone and subject are required", "பெயர், தொலைபேசி மற்றும் தலைப்பு தேவை"));
+      return;
+    }
+    setBusy(true);
+    setErr("");
+    try {
+      const size = parseInt(partySize, 10);
+      await adminApi.createAppointment({
+        name: name.trim(),
+        phone: phone.trim(),
+        email: email.trim() || null,
+        ward: ward.trim() || null,
+        address: address.trim() || null,
+        category,
+        subject: subject.trim(),
+        description: description.trim() || null,
+        partySize: Number.isFinite(size) && size > 0 ? size : 1,
+        preferredDate: preferredDate || null,
+        preferredTime: preferredTime || null,
+        alternateDate: alternateDate || null,
+        scheduledDate: scheduledDate || null,
+        scheduledTime: scheduledTime || null,
+        location: location.trim() || null,
+        status,
+      });
+      onCreated();
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : lc("Could not create appointment", "சந்திப்பை உருவாக்க முடியவில்லை"));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end" data-testid="create-appointment-drawer">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full max-w-md bg-background h-full overflow-y-auto shadow-xl border-l">
+        <div className="sticky top-0 bg-background border-b px-5 py-4 flex items-center justify-between">
+          <h3 className="font-semibold flex items-center gap-2"><Plus className="w-4 h-4 text-primary" />{lc("Book Appointment", "சந்திப்பு பதிவு")}</h3>
+          <Button variant="ghost" size="icon" onClick={onClose}><X className="w-5 h-5" /></Button>
+        </div>
+
+        <div className="p-5 space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Name", "பெயர்")} *</label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} data-testid="input-new-name" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Phone", "தொலைபேசி")} *</label>
+              <Input value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="input-new-phone" />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">{lc("Email", "மின்னஞ்சல்")}</label>
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} data-testid="input-new-email" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Ward", "வார்டு")}</label>
+              <Input value={ward} onChange={(e) => setWard(e.target.value)} data-testid="input-new-ward" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Party size", "நபர்கள்")}</label>
+              <Input type="number" min={1} value={partySize} onChange={(e) => setPartySize(e.target.value)} data-testid="input-new-partysize" />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">{lc("Address", "முகவரி")}</label>
+            <Input value={address} onChange={(e) => setAddress(e.target.value)} data-testid="input-new-address" />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">{lc("Purpose", "நோக்கம்")}</label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger data-testid="select-new-category"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">{lc("Subject", "தலைப்பு")} *</label>
+            <Input value={subject} onChange={(e) => setSubject(e.target.value)} data-testid="input-new-subject" />
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">{lc("Description", "விவரம்")}</label>
+            <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} data-testid="input-new-description" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Preferred date", "விரும்பிய தேதி")}</label>
+              <Input type="date" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)} data-testid="input-new-preferred-date" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Preferred time", "விரும்பிய நேரம்")}</label>
+              <Input type="time" value={preferredTime} onChange={(e) => setPreferredTime(e.target.value)} data-testid="input-new-preferred-time" />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs text-muted-foreground">{lc("Alternate date", "மாற்று தேதி")}</label>
+            <Input type="date" value={alternateDate} onChange={(e) => setAlternateDate(e.target.value)} data-testid="input-new-alternate-date" />
+          </div>
+
+          <div className="border-t pt-3 space-y-3">
+            <p className="text-sm font-semibold">{lc("Schedule now (optional)", "இப்போது திட்டமிடு (விருப்பம்)")}</p>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Scheduled date", "திட்டமிட்ட தேதி")}</label>
+                <Input type="date" value={scheduledDate} onChange={(e) => setScheduledDate(e.target.value)} data-testid="input-new-scheduled-date" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Scheduled time", "திட்டமிட்ட நேரம்")}</label>
+                <Input type="time" value={scheduledTime} onChange={(e) => setScheduledTime(e.target.value)} data-testid="input-new-scheduled-time" />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Location", "இடம்")}</label>
+              <Input value={location} onChange={(e) => setLocation(e.target.value)} placeholder={lc("Meeting venue", "சந்திப்பு இடம்")} data-testid="input-new-location" />
+            </div>
+            <div>
+              <label className="text-xs text-muted-foreground">{lc("Status", "நிலை")}</label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger data-testid="select-new-status"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map((s) => <SelectItem key={s} value={s}>{lc(s, STATUS_META[s]?.ta ?? s)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {err && <p className="text-sm text-red-600">{err}</p>}
+          <div className="flex gap-2 pt-1">
+            <Button size="sm" disabled={busy} onClick={submit} data-testid="button-create-appointment">
+              {busy ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}{lc("Create", "உருவாக்கு")}
+            </Button>
+            <Button size="sm" variant="outline" disabled={busy} onClick={onClose} data-testid="button-cancel-create">
+              {lc("Cancel", "ரத்து")}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

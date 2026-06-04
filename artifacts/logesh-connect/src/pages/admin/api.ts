@@ -275,6 +275,8 @@ export const adminApi = {
   },
   getAppointment: (id: number) => authFetch(`/admin/appointments/${id}`),
   getAppointmentStats: () => authFetch("/admin/appointments/stats"),
+  createAppointment: (data: unknown) =>
+    authFetch(`/admin/appointments`, { method: "POST", body: JSON.stringify(data) }),
   updateAppointment: (id: number, data: unknown) =>
     authFetch(`/admin/appointments/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   deleteAppointment: (id: number) => authFetch(`/admin/appointments/${id}`, { method: "DELETE" }),
