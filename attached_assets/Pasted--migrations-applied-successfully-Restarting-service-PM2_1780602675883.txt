@@ -1,0 +1,26 @@
+[✓] migrations applied successfully!▶ Restarting service...
+[PM2] Applying action restartProcessId on app [ungaludan-sarath](ids: [ 24 ])
+[PM2] [ungaludan-sarath](24) ✓
+┌────┬───────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                  │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 2  │ automystics-api       │ default     │ 0.0.0   │ fork    │ 3762968  │ 3D     │ 15   │ online    │ 0%       │ 96.0mb   │ root     │ disabled │
+│ 0  │ fitro360              │ default     │ 1.0.0   │ fork    │ 3762940  │ 3D     │ 15   │ online    │ 0%       │ 116.6mb  │ root     │ disabled │
+│ 1  │ kalvicore-api         │ default     │ 0.0.0   │ fork    │ 3762941  │ 3D     │ 15   │ online    │ 0%       │ 108.8mb  │ root     │ disabled │
+│ 20 │ mystics-api           │ default     │ N/A     │ fork    │ 3893514  │ 3m     │ 5    │ online    │ 0%       │ 95.9mb   │ root     │ disabled │
+│ 18 │ mysticscivil-api      │ default     │ N/A     │ fork    │ 3763033  │ 3D     │ 1    │ online    │ 0%       │ 233.3mb  │ root     │ disabled │
+│ 11 │ mysticshr-api         │ default     │ 0.0.0   │ fork    │ 3762995  │ 3D     │ 1179 │ online    │ 0%       │ 262.7mb  │ root     │ disabled │
+│ 4  │ people-connect-api    │ default     │ 0.0.0   │ fork    │ 3762956  │ 3D     │ 16   │ online    │ 0%       │ 198.6mb  │ root     │ disabled │
+│ 23 │ solarnexus-api        │ default     │ 0.0.0   │ fork    │ 3763079  │ 3D     │ 1    │ online    │ 0%       │ 131.6mb  │ root     │ disabled │
+│ 6  │ tkprabhu-api          │ default     │ 0.0.0   │ fork    │ 3762992  │ 3D     │ 38   │ online    │ 0%       │ 203.0mb  │ root     │ disabled │
+│ 24 │ ungaludan-sarath      │ default     │ 0.0.0   │ fork    │ 3903981  │ 0s     │ 5    │ online    │ 0%       │ 17.8mb   │ root     │ disabled │
+└────┴───────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+▶ Waiting for the app to respond on :6000 ...
+
+⚠ Deployment finished but the app did not return 200 yet.
+  Check logs:  pm2 logs ungaludan-sarath
+   Logs: pm2 logs ungaludan-sarath
+
+root@srv1609330:/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com# 
