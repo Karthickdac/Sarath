@@ -1,0 +1,25 @@
+root@srv1609330:/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com# # is the new process actually listening on 5500?
+ss -ltnp | grep ':5500'
+
+# does it answer 200 locally?
+curl -s -o /dev/null -w "%{http_code}\n" http://127.0.0.1:5500/
+
+# fresh log lines from the new process
+pm2 logs ungaludan-sarath --lines 15 --nostream
+LISTEN 0      511                *:5500             *:*    users:(("node /home/unga",pid=3927889,fd=23))                                                                                                   
+200
+[TAILING] Tailing last 15 lines for [ungaludan-sarath] process (change the value with --lines option)
+/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/logs/api-error.log last 15 lines:
+/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/logs/api-out.log last 15 lines:
+25|ungalud | sk_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+25|ungalud | 2026-06-04 19:57:54: [grievances] uploads dir resolved: /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads/grievances (0 file(s) present)
+25|ungalud | 2026-06-04 19:57:54: [grievances] uploads candidates tried (in order): cwd-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads, module-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads
+25|ungalud | 2026-06-04 19:57:54: {"level":30,"time":1780603074939,"pid":3927762,"hostname":"srv1609330","clientDist":"/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/logesh-connect/dist/public","msg":"Serving frontend static build"}
+25|ungalud | 2026-06-04 19:57:54: {"level":50,"time":1780603074941,"pid":3927762,"hostname":"srv1609330","err":{"type":"Error","message":"listen EADDRINUSE: address already in use :::6000","stack":"Error: listen EADDRINUSE: address already in use :::6000\n    at Server.setupListenHandle [as _listen2] (node:net:2008:16)\n    at listenInCluster (node:net:2065:12)\n    at Server.listen (node:net:2170:7)\n    at app2.listen (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+25|ungalud | 2026-06-04 19:57:56: [grievances] uploads dir resolved: /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads/grievances (0 file(s) present)
+25|ungalud | 2026-06-04 19:57:56: [grievances] uploads candidates tried (in order): cwd-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads, module-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads
+25|ungalud | 2026-06-04 19:57:56: {"level":30,"time":1780603076823,"pid":3927889,"hostname":"srv1609330","clientDist":"/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/logesh-connect/dist/public","msg":"Serving frontend static build"}
+25|ungalud | 2026-06-04 19:57:56: {"level":30,"time":1780603076825,"pid":3927889,"hostname":"srv1609330","port":5500,"msg":"Server listening"}
+25|ungalud | 2026-06-04 19:59:08: {"level":30,"time":1780603148098,"pid":3927889,"hostname":"srv1609330","req":{"id":1,"method":"GET","url":"/"},"res":{"statusCode":200},"responseTime":8,"msg":"request completed"}
+
+root@srv1609330:/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com# 
