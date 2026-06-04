@@ -28,6 +28,14 @@ URL config is needed behind the proxy.
 - The static-serving branch only activates when `dist/public/index.html` exists; otherwise the
   server logs "API-only mode" and still serves `/api`.
 
+**PORT / env changes need a full PM2 re-create, not `pm2 restart`.** `pm2 restart <app> --update-env`
+reads env from the **current shell**, not from `.env` (only `deploy.sh` sources `.env` via `set -a; . .env`).
+So editing `.env` then running a bare `pm2 restart` reuses PM2's *cached* env (e.g. stale `PORT`).
+**Why:** caused a persistent `EADDRINUSE :::6000` crash-loop after changing PORT — the app kept binding the
+old port. **How to apply:** `pm2 delete <app>; set -a; . ./.env; set +a; pm2 start ecosystem.config.cjs; pm2 save`
+(or just re-run `bash deploy.sh`, which sources `.env` before restart). Port must be free of the VPS's other
+apps; 5500 is the documented default. Avoid port 6000 — browsers reject it as an unsafe port (`ERR_UNSAFE_PORT`).
+
 **Schema changes use versioned migrations** (not in-place `push`): edit schema, run
 `@workspace/db run generate`, review + commit the `.sql` in `lib/db/migrations/`. Prod applies
 them via `migrate`. `scripts/baseline.mjs` (idempotent, runs first in deploy) marks the `0000`
