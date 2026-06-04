@@ -116,7 +116,7 @@ function Router({ lang, setLang, darkMode, setDarkMode }: {
       <ScrollToTop />
       <Switch>
         <Route path="/login" component={() => <Login />} />
-        <Route path="/admin" component={() => <Admin />} />
+        <Route path="/admin" component={() => <Admin lang={lang} setLang={setLang} />} />
         <Route component={() => (
           <PublicRoutes lang={lang} setLang={setLang} darkMode={darkMode} setDarkMode={setDarkMode} />
         )} />
@@ -132,6 +132,8 @@ export default function App() {
   useEffect(() => {
     const stored = localStorage.getItem("nirmal_theme");
     if (stored === "dark") setDarkMode(true);
+    const storedLang = localStorage.getItem("nc.lang");
+    if (storedLang === "en" || storedLang === "ta") setLang(storedLang);
   }, []);
 
   useEffect(() => {
@@ -141,6 +143,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.lang = lang;
+    localStorage.setItem("nc.lang", lang);
   }, [lang]);
 
   return (

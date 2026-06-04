@@ -2752,6 +2752,18 @@ const AppointmentPatchBody = z.object({
   decisionNote: z.string().optional().nullable(),
   rejectionReason: z.string().optional().nullable(),
   notificationMessage: z.string().optional().nullable(),
+  // Editable requester / request details (correct a citizen's booking)
+  name: z.string().min(1).max(200).optional(),
+  phone: z.string().min(1).max(40).optional(),
+  email: z.string().max(200).optional().nullable(),
+  address: z.string().max(2000).optional().nullable(),
+  ward: z.string().max(200).optional().nullable(),
+  subject: z.string().min(1).max(500).optional(),
+  description: z.string().max(5000).optional().nullable(),
+  partySize: z.number().int().min(1).max(1000).optional(),
+  preferredDate: z.string().optional().nullable(),
+  preferredTime: z.string().optional().nullable(),
+  alternateDate: z.string().optional().nullable(),
 });
 
 // PATCH /api/admin/appointments/:id — decide (approve/reschedule/reject/complete/cancel) + edit
@@ -2773,6 +2785,16 @@ router.patch("/admin/appointments/:id", requireRole(...APPT_MANAGE_ROLES), async
     if (d.rejectionReason !== undefined) patch.rejectionReason = d.rejectionReason;
     if (d.notificationMessage !== undefined) patch.notificationMessage = d.notificationMessage;
     if (d.scheduledTime !== undefined) patch.scheduledTime = d.scheduledTime;
+    // Editable requester / request details
+    if (d.name !== undefined) patch.name = d.name;
+    if (d.phone !== undefined) patch.phone = d.phone;
+    if (d.email !== undefined) patch.email = d.email;
+    if (d.address !== undefined) patch.address = d.address;
+    if (d.ward !== undefined) patch.ward = d.ward;
+    if (d.subject !== undefined) patch.subject = d.subject;
+    if (d.description !== undefined) patch.description = d.description;
+    if (d.partySize !== undefined) patch.partySize = d.partySize;
+    if (d.preferredTime !== undefined) patch.preferredTime = d.preferredTime;
     if (d.scheduledDate !== undefined) {
       if (d.scheduledDate === null) {
         patch.scheduledDate = null;
@@ -2783,6 +2805,30 @@ router.patch("/admin/appointments/:id", requireRole(...APPT_MANAGE_ROLES), async
           return;
         }
         patch.scheduledDate = sd;
+      }
+    }
+    if (d.preferredDate !== undefined) {
+      if (d.preferredDate === null) {
+        patch.preferredDate = null;
+      } else {
+        const pd = new Date(d.preferredDate);
+        if (Number.isNaN(pd.getTime())) {
+          res.status(400).json({ error: "Invalid preferredDate" });
+          return;
+        }
+        patch.preferredDate = pd;
+      }
+    }
+    if (d.alternateDate !== undefined) {
+      if (d.alternateDate === null) {
+        patch.alternateDate = null;
+      } else {
+        const ad = new Date(d.alternateDate);
+        if (Number.isNaN(ad.getTime())) {
+          res.status(400).json({ error: "Invalid alternateDate" });
+          return;
+        }
+        patch.alternateDate = ad;
       }
     }
     if (d.status !== undefined) {

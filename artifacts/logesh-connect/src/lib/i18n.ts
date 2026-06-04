@@ -475,3 +475,101 @@ export function tHi<K extends HierarchyKey>(
   const dict = hierarchyAdminTranslations[lang];
   return (dict[key] ?? hierarchyAdminTranslations.en[key]) as typeof hierarchyAdminTranslations.en[K];
 }
+
+// ── Admin portal labels ─────────────────────────────────────
+// Keyed by the English string so existing nav arrays can stay as-is and be
+// translated at render time. Covers the admin shell (sidebar groups + items,
+// header, buttons) and the main Dashboard. Add deeper screens incrementally.
+export const adminLabels: Record<string, string> = {
+  // Nav groups
+  "Overview": "கண்ணோட்டம்",
+  "Schedule": "அட்டவணை",
+  "Grievances": "குறைகள்",
+  "Voters": "வாக்காளர்கள்",
+  "Maps": "வரைபடங்கள்",
+  "Content": "உள்ளடக்கம்",
+  "Outreach": "சேவை அணுகல்",
+  "Site": "தளம்",
+  "System": "அமைப்பு",
+  "Home": "முகப்பு",
+  "Press & News": "பத்திரிகை & செய்திகள்",
+  "Promises": "வாக்குறுதிகள்",
+  "People": "பணியாளர்கள்",
+  "Comms": "தொடர்பு",
+  "Settings": "அமைப்புகள்",
+  // Nav items
+  "My Dashboard": "எனது டாஷ்போர்டு",
+  "PA Home": "பிஏ முகப்பு",
+  "Today's Schedule": "இன்றைய அட்டவணை",
+  "Activities": "செயல்பாடுகள்",
+  "Leader Dashboard": "தலைவர் டாஷ்போர்டு",
+  "Dashboard": "டாஷ்போர்டு",
+  "Analytics": "பகுப்பாய்வு",
+  "Tasks": "பணிகள்",
+  "Calendar": "நாட்காட்டி",
+  "Appointments": "சந்திப்புகள்",
+  "Officer Assignments": "அதிகாரி நியமனங்கள்",
+  "SLA Performance": "SLA செயல்திறன்",
+  "Escalations": "மேல்முறையீடுகள்",
+  "Voter Search": "வாக்காளர் தேடல்",
+  "Voter Roll": "வாக்காளர் பட்டியல்",
+  "Voter Tags": "வாக்காளர் குறிச்சொற்கள்",
+  "Voter Exports": "வாக்காளர் ஏற்றுமதி",
+  "Constituency Map": "தொகுதி வரைபடம்",
+  "Grievance Heatmap": "குறை வெப்ப வரைபடம்",
+  "3D Map": "3D வரைபடம்",
+  "News": "செய்திகள்",
+  "Press Releases": "பத்திரிகை வெளியீடுகள்",
+  "Press Coverage": "பத்திரிகை செய்திகள்",
+  "Events": "நிகழ்வுகள்",
+  "Gallery": "படத்தொகுப்பு",
+  "Banners": "பதாகைகள்",
+  "Volunteers": "தன்னார்வலர்கள்",
+  "Constituency & Wards": "தொகுதி & வார்டுகள்",
+  "Broadcast": "ஒளிபரப்பு",
+  "Social Media": "சமூக ஊடகம்",
+  "Promises Tracker": "வாக்குறுதி கண்காணிப்பு",
+  "Outreach Scorecard": "சேவை மதிப்பெண் அட்டை",
+  "Home CMS": "முகப்பு CMS",
+  "About CMS": "பற்றி CMS",
+  "FAQs": "அடிக்கடி கேட்கப்படும் கேள்விகள்",
+  "Site Settings": "தள அமைப்புகள்",
+  "AI Tools": "AI கருவிகள்",
+  "Audit Log": "தணிக்கை பதிவு",
+  // Shell chrome
+  "Admin Panel": "நிர்வாக பலகை",
+  "Logout": "வெளியேறு",
+  "Sign out": "வெளியேறு",
+  "Minister": "அமைச்சர்",
+  "Access Denied": "அணுகல் மறுக்கப்பட்டது",
+  "Constituency": "தொகுதி",
+  "Loading map…": "வரைபடம் ஏற்றப்படுகிறது…",
+  "Legacy ward coordinator list (flat view)": "பழைய வார்டு ஒருங்கிணைப்பாளர் பட்டியல் (தட்டையான பார்வை)",
+  // Dashboard
+  "Dashboard Overview": "டாஷ்போர்டு கண்ணோட்டம்",
+  "Real-time constituency data & grievance analytics": "நிகழ்நேர தொகுதி தரவு & குறை பகுப்பாய்வு",
+  "Total Grievances": "மொத்த குறைகள்",
+  "Open Grievances": "திறந்த குறைகள்",
+  "Resolved": "தீர்க்கப்பட்டது",
+  "Resolution Rate": "தீர்வு விகிதம்",
+  "Avg Resolution": "சராசரி தீர்வு நேரம்",
+  "Pending Volunteers": "நிலுவையில் உள்ள தன்னார்வலர்கள்",
+  "News Articles": "செய்தி கட்டுரைகள்",
+  "Events This Month": "இந்த மாத நிகழ்வுகள்",
+  "Gallery Items": "படத்தொகுப்பு உருப்படிகள்",
+  "Monthly Grievance Trend (Last 6 Months)": "மாதாந்திர குறை போக்கு (கடந்த 6 மாதங்கள்)",
+  "Grievances by Category": "வகை வாரியான குறைகள்",
+  "Resolution Overview": "தீர்வு கண்ணோட்டம்",
+  "Recent Admin Activity": "சமீபத்திய நிர்வாக செயல்பாடு",
+  "No admin activity yet": "இதுவரை நிர்வாக செயல்பாடு இல்லை",
+  "Loading dashboard…": "டாஷ்போர்டு ஏற்றப்படுகிறது…",
+  "Submitted": "சமர்ப்பிக்கப்பட்டது",
+  "Count": "எண்ணிக்கை",
+};
+
+// Translate an admin UI string by its English text. Falls back to the English
+// (the key itself) when no Tamil mapping exists or lang is English.
+export function tAdmin(lang: Language, en: string): string {
+  if (lang === "en") return en;
+  return adminLabels[en] ?? en;
+}

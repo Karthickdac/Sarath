@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import {
   LayoutDashboard, Newspaper, Calendar, Activity, Image,
   Users, MessageSquare, HelpCircle, UserCircle, LogOut, Menu, X,
-  ChevronRight, ChevronDown, Settings, Megaphone, FileText, MapPin, ClipboardList, Network, Map as MapIcon, BarChart3, Home as HomeIcon, ShieldAlert, Share2, Trophy, Radio, Sparkles, Newspaper as NewsIcon, Timer, Flame, Layers, CheckSquare, CalendarDays, CalendarCheck,
+  ChevronRight, ChevronDown, Settings, Megaphone, FileText, MapPin, ClipboardList, Network, Map as MapIcon, BarChart3, Home as HomeIcon, ShieldAlert, Share2, Trophy, Radio, Sparkles, Newspaper as NewsIcon, Timer, Flame, Layers, CheckSquare, CalendarDays, CalendarCheck, Globe,
 } from "lucide-react";
 import { isAuthenticated, removeToken, getToken } from "@/lib/auth";
 import { useGetMe } from "@workspace/api-client-react";
@@ -53,12 +53,12 @@ import AppointmentsAdmin from "./admin/AppointmentsAdmin";
 import MinisterHome from "./admin/MinisterHome";
 import PaHome from "./admin/PaHome";
 import MinisterReadOnly from "./admin/MinisterReadOnly";
-import type { Language } from "@/lib/i18n";
+import { type Language, tAdmin } from "@/lib/i18n";
 import { useLeaderConfig, lc } from "@/lib/LeaderConfigContext";
 import { Crown } from "lucide-react";
 import { UnsavedChangesProvider, useConfirmDiscard } from "@/lib/unsavedChanges";
 
-interface AdminProps { lang?: Language }
+interface AdminProps { lang?: Language; setLang?: (l: Language) => void }
 
 type NavGroupId =
   | "overview"
@@ -234,15 +234,15 @@ function saveCollapsedGroups(set: Set<NavGroupId>): void {
   }
 }
 
-export default function Admin({ lang = "ta" }: AdminProps) {
+export default function Admin({ lang = "ta", setLang }: AdminProps) {
   return (
     <UnsavedChangesProvider>
-      <AdminInner lang={lang} />
+      <AdminInner lang={lang} setLang={setLang} />
     </UnsavedChangesProvider>
   );
 }
 
-function AdminInner({ lang = "ta" }: AdminProps) {
+function AdminInner({ lang = "ta", setLang }: AdminProps) {
   const [, setLocation] = useLocation();
   const confirmDiscard = useConfirmDiscard();
   const { data: me, error } = useGetMe();
@@ -434,7 +434,7 @@ function AdminInner({ lang = "ta" }: AdminProps) {
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center font-bold text-sm shrink-0">{leader.logoInitial}</div>
             <div className="min-w-0">
               <p className="font-semibold text-sm truncate">{leader.siteTitle}</p>
-              <p className="text-xs text-gray-400 truncate">Admin Panel</p>
+              <p className="text-xs text-gray-400 truncate">{tAdmin(lang, "Admin Panel")}</p>
             </div>
           </div>
         </div>

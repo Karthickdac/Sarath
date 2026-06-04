@@ -10,7 +10,7 @@ import {
   CalendarCheck, Search, Download, X, ChevronLeft, ChevronRight,
   Clock, CheckCircle, CalendarClock, CheckCheck, XCircle, RotateCcw,
   Phone, Mail, MapPin, Users as UsersIcon, Loader2, Trash2, List, CalendarDays,
-  Sparkles,
+  Sparkles, Pencil,
 } from "lucide-react";
 import type { Language } from "@/lib/i18n";
 
@@ -396,6 +396,21 @@ function AppointmentDrawer({ lang, readOnly, canDelete, appointment, onClose, on
   const [suggesting, setSuggesting] = useState(false);
   const [slotHint, setSlotHint] = useState("");
 
+  // Editable booking details
+  const [editing, setEditing] = useState(false);
+  const [name, setName] = useState(a.name ?? "");
+  const [phone, setPhone] = useState(a.phone ?? "");
+  const [email, setEmail] = useState(a.email ?? "");
+  const [ward, setWard] = useState(a.ward ?? "");
+  const [address, setAddress] = useState(a.address ?? "");
+  const [category, setCategory] = useState(a.category ?? "General");
+  const [subject, setSubject] = useState(a.subject ?? "");
+  const [description, setDescription] = useState(a.description ?? "");
+  const [partySize, setPartySize] = useState(String(a.partySize ?? 1));
+  const [preferredDate, setPreferredDate] = useState(a.preferredDate ? a.preferredDate.slice(0, 10) : "");
+  const [preferredTime, setPreferredTime] = useState(a.preferredTime ?? "");
+  const [alternateDate, setAlternateDate] = useState(a.alternateDate ? a.alternateDate.slice(0, 10) : "");
+
   async function handleSuggestSlot() {
     setSuggesting(true);
     setErr("");
@@ -413,17 +428,38 @@ function AppointmentDrawer({ lang, readOnly, canDelete, appointment, onClose, on
     }
   }
 
-  async function mutate(patch: Record<string, unknown>) {
+  async function mutate(patch: Record<string, unknown>): Promise<boolean> {
     setBusy(true);
     setErr("");
     try {
       const updated = await adminApi.updateAppointment(a.id, patch);
       onMutated(updated as Appointment);
+      return true;
     } catch (e) {
       setErr(e instanceof Error ? e.message : lc("Update failed", "புதுப்பிப்பு தோல்வி"));
+      return false;
     } finally {
       setBusy(false);
     }
+  }
+
+  async function saveDetails() {
+    const size = parseInt(partySize, 10);
+    const ok = await mutate({
+      name: name.trim(),
+      phone: phone.trim(),
+      email: email.trim() || null,
+      ward: ward.trim() || null,
+      address: address.trim() || null,
+      category,
+      subject: subject.trim(),
+      description: description.trim() || null,
+      partySize: Number.isFinite(size) && size > 0 ? size : 1,
+      preferredDate: preferredDate || null,
+      preferredTime: preferredTime || null,
+      alternateDate: alternateDate || null,
+    });
+    if (ok) setEditing(false);
   }
 
   const approve = () => mutate({ status: "Approved", scheduledDate: scheduledDate || null, scheduledTime: scheduledTime || null, location: location || null, decisionNote: decisionNote || null, notificationMessage: notificationMessage || null });
@@ -463,13 +499,90 @@ function AppointmentDrawer({ lang, readOnly, canDelete, appointment, onClose, on
         <div className="p-5 space-y-4">
           {/* Requester */}
           <div className="space-y-1.5">
-            <h3 className="text-lg font-bold">{a.name}</h3>
-            <p className="text-sm flex items-center gap-2"><Phone className="w-4 h-4 text-muted-foreground" />{a.phone}</p>
-            {a.email && <p className="text-sm flex items-center gap-2"><Mail className="w-4 h-4 text-muted-foreground" />{a.email}</p>}
-            {(a.ward || a.address) && <p className="text-sm flex items-center gap-2"><MapPin className="w-4 h-4 text-muted-foreground" />{[a.ward, a.address].filter(Boolean).join(", ")}</p>}
-            {a.partySize ? <p className="text-sm flex items-center gap-2"><UsersIcon className="w-4 h-4 text-muted-foreground" />{a.partySize} {lc("people", "பேர்")}</p> : null}
+            {!editing && <h3 className="text-lg font-bold">{a.name}</h3>}
+            {!editing && <p className="text-sm flex items-center gap-2"><Phone className="w-4 h-4 text-muted-foreground" />{a.phone}</p>}
+            {!editing && a.email && <p className="text-sm flex items-center gap-2"><Mail className="w-4 h-4 text-muted-foreground" />{a.email}</p>}
+            {!editing && (a.ward || a.address) && <p className="text-sm flex items-center gap-2"><MapPin className="w-4 h-4 text-muted-foreground" />{[a.ward, a.address].filter(Boolean).join(", ")}</p>}
+            {!editing && a.partySize ? <p className="text-sm flex items-center gap-2"><UsersIcon className="w-4 h-4 text-muted-foreground" />{a.partySize} {lc("people", "பேர்")}</p> : null}
+            {!readOnly && !editing && (
+              <Button variant="outline" size="sm" className="mt-2" onClick={() => setEditing(true)} data-testid="button-edit-details">
+                <Pencil className="w-3.5 h-3.5 mr-1" />{lc("Edit details", "விவரங்களை திருத்து")}
+              </Button>
+            )}
           </div>
 
+          {editing ? (
+            <div className="border-t pt-3 space-y-3" data-testid="edit-details-form">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">{lc("Name", "பெயர்")}</label>
+                  <Input value={name} onChange={(e) => setName(e.target.value)} data-testid="input-edit-name" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">{lc("Phone", "தொலைபேசி")}</label>
+                  <Input value={phone} onChange={(e) => setPhone(e.target.value)} data-testid="input-edit-phone" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Email", "மின்னஞ்சல்")}</label>
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} data-testid="input-edit-email" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">{lc("Ward", "வார்டு")}</label>
+                  <Input value={ward} onChange={(e) => setWard(e.target.value)} data-testid="input-edit-ward" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">{lc("Party size", "நபர்கள்")}</label>
+                  <Input type="number" min={1} value={partySize} onChange={(e) => setPartySize(e.target.value)} data-testid="input-edit-partysize" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Address", "முகவரி")}</label>
+                <Input value={address} onChange={(e) => setAddress(e.target.value)} data-testid="input-edit-address" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Purpose", "நோக்கம்")}</label>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger data-testid="select-edit-category"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Subject", "தலைப்பு")}</label>
+                <Input value={subject} onChange={(e) => setSubject(e.target.value)} data-testid="input-edit-subject" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Description", "விவரம்")}</label>
+                <Textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} data-testid="input-edit-description" />
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-xs text-muted-foreground">{lc("Preferred date", "விரும்பிய தேதி")}</label>
+                  <Input type="date" value={preferredDate} onChange={(e) => setPreferredDate(e.target.value)} data-testid="input-edit-preferred-date" />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground">{lc("Preferred time", "விரும்பிய நேரம்")}</label>
+                  <Input type="time" value={preferredTime} onChange={(e) => setPreferredTime(e.target.value)} data-testid="input-edit-preferred-time" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground">{lc("Alternate date", "மாற்று தேதி")}</label>
+                <Input type="date" value={alternateDate} onChange={(e) => setAlternateDate(e.target.value)} data-testid="input-edit-alternate-date" />
+              </div>
+              {err && <p className="text-sm text-red-600">{err}</p>}
+              <div className="flex gap-2">
+                <Button size="sm" disabled={busy} onClick={saveDetails} data-testid="button-save-details">
+                  {busy ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <CheckCircle className="w-4 h-4 mr-1" />}{lc("Save", "சேமி")}
+                </Button>
+                <Button size="sm" variant="outline" disabled={busy} onClick={() => { setEditing(false); setErr(""); }} data-testid="button-cancel-edit">
+                  {lc("Cancel", "ரத்து")}
+                </Button>
+              </div>
+            </div>
+          ) : (
           <div className="border-t pt-3 space-y-2 text-sm">
             <p><span className="font-medium">{lc("Purpose:", "நோக்கம்:")}</span> {a.category}</p>
             <p><span className="font-medium">{lc("Subject:", "தலைப்பு:")}</span> {a.subject}</p>
@@ -484,6 +597,7 @@ function AppointmentDrawer({ lang, readOnly, canDelete, appointment, onClose, on
             )}
             {a.handledByName && <p className="text-xs text-muted-foreground">{lc("Handled by:", "கையாண்டவர்:")} {a.handledByName}</p>}
           </div>
+          )}
 
           {readOnly ? (
             <div className="border-t pt-3 space-y-2 text-sm">
