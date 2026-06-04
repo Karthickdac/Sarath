@@ -1,0 +1,102 @@
+                     
+root@srv1609330:/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com# cd /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com
+
+# make sure 5500 is actually free:
+ss -ltnp | grep ':5500' || echo "5500 is free ✓"
+
+# set PORT=5500 in .env (adds it if missing, replaces if present):
+grep -q '^PORT=' .env && sed -i 's/^PORT=.*/PORT=5500/' .env || echo 'PORT=5500' >> .env
+
+pm2 restart ungaludan-sarath --update-env
+pm2 logs ungaludan-sarath --lines 20 --nostream
+5500 is free ✓
+[PM2] Applying action restartProcessId on app [ungaludan-sarath](ids: [ 24 ])
+[PM2] [ungaludan-sarath](24) ✓
+┌────┬───────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                  │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 2  │ automystics-api       │ default     │ 0.0.0   │ fork    │ 3762968  │ 3D     │ 15   │ online    │ 0%       │ 96.0mb   │ root     │ disabled │
+│ 0  │ fitro360              │ default     │ 1.0.0   │ fork    │ 3762940  │ 3D     │ 15   │ online    │ 0%       │ 116.6mb  │ root     │ disabled │
+│ 1  │ kalvicore-api         │ default     │ 0.0.0   │ fork    │ 3762941  │ 3D     │ 15   │ online    │ 0%       │ 108.8mb  │ root     │ disabled │
+│ 20 │ mystics-api           │ default     │ N/A     │ fork    │ 3893514  │ 10m    │ 5    │ online    │ 0%       │ 95.9mb   │ root     │ disabled │
+│ 18 │ mysticscivil-api      │ default     │ N/A     │ fork    │ 3763033  │ 3D     │ 1    │ online    │ 0%       │ 233.3mb  │ root     │ disabled │
+│ 11 │ mysticshr-api         │ default     │ 0.0.0   │ fork    │ 3762995  │ 3D     │ 1179 │ online    │ 0%       │ 262.7mb  │ root     │ disabled │
+│ 4  │ people-connect-api    │ default     │ 0.0.0   │ fork    │ 3762956  │ 3D     │ 16   │ online    │ 0%       │ 198.6mb  │ root     │ disabled │
+│ 23 │ solarnexus-api        │ default     │ 0.0.0   │ fork    │ 3763079  │ 3D     │ 1    │ online    │ 0%       │ 131.6mb  │ root     │ disabled │
+│ 6  │ tkprabhu-api          │ default     │ 0.0.0   │ fork    │ 3762992  │ 3D     │ 38   │ online    │ 0%       │ 203.0mb  │ root     │ disabled │
+│ 24 │ ungaludan-sarath      │ default     │ 0.0.0   │ fork    │ 3923605  │ 0s     │ 355  │ online    │ 0%       │ 26.6mb   │ root     │ disabled │
+└────┴───────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[TAILING] Tailing last 20 lines for [ungaludan-sarath] process (change the value with --lines option)
+/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/logs/api-error.log last 20 lines:
+/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/logs/api-out.log last 20 lines:
+24|ungalud | 2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+24|ungalud | 2026-06-04 19:56:36: [grievances] uploads dir resolved: /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads/grievances (0 file(s) present)
+24|ungalud | 2026-06-04 19:56:36: [grievances] uploads candidates tried (in order): cwd-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads, module-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads
+24|ungalud | 2026-06-04 19:56:36: {"level":30,"time":1780602996363,"pid":3923442,"hostname":"srv1609330","clientDist":"/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/logesh-connect/dist/public","msg":"Serving frontend static build"}
+24|ungalud | 2026-06-04 19:56:36: {"level":50,"time":1780602996365,"pid":3923442,"hostname":"srv1609330","err":{"type":"Error","message":"listen EADDRINUSE: address already in use :::6000","stack":"Error: listen EADDRINUSE: address already in use :::6000\n    at Server.setupListenHandle [as _listen2] (node:net:2008:16)\n    at listenInCluster (node:net:2065:12)\n    at Server.listen (node:net:2170:7)\n    at app2.listen (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+24|ungalud | 2026-06-04 19:56:37: [grievances] uploads dir resolved: /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads/grievances (0 file(s) present)
+24|ungalud | 2026-06-04 19:56:37: [grievances] uploads candidates tried (in order): cwd-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads, module-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads
+24|ungalud | 2026-06-04 19:56:37: {"level":30,"time":1780602997327,"pid":3923490,"hostname":"srv1609330","clientDist":"/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/logesh-connect/dist/public","msg":"Serving frontend static build"}
+24|ungalud | 2026-06-04 19:56:37: {"level":50,"time":1780602997329,"pid":3923490,"hostname":"srv1609330","err":{"type":"Error","message":"listen EADDRINUSE: address already in use :::6000","stack":"Error: listen EADDRINUSE: address already in use :::6000\n    at Server.setupListenHandle [as _listen2] (node:net:2008:16)\n    at listenInCluster (node:net:2065:12)\n    at Server.listen (node:net:2170:7)\n    at app2.listen (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+
+root@srv1609330:/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com# cd /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com
+
+# 1. confirm .env actually has 5500
+grep '^PORT=' .env          # should print: PORT=5500
+
+# 2. delete the cached PM2 process, load .env, start fresh
+pm2 delete ungaludan-sarath
+set -a; . ./.env; set +a
+pm2 start ecosystem.config.cjs
+pm2 save
+
+# 3. verify
+pm2 logs ungaludan-sarath --lines 20 --nostream
+PORT=5500
+[PM2] Applying action deleteProcessId on app [ungaludan-sarath](ids: [ 24 ])
+[PM2] [ungaludan-sarath](24) ✓
+┌────┬───────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                  │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 2  │ automystics-api       │ default     │ 0.0.0   │ fork    │ 3762968  │ 3D     │ 15   │ online    │ 7.1%     │ 96.0mb   │ root     │ disabled │
+│ 0  │ fitro360              │ default     │ 1.0.0   │ fork    │ 3762940  │ 3D     │ 15   │ online    │ 0%       │ 116.6mb  │ root     │ disabled │
+│ 1  │ kalvicore-api         │ default     │ 0.0.0   │ fork    │ 3762941  │ 3D     │ 15   │ online    │ 0%       │ 108.8mb  │ root     │ disabled │
+│ 20 │ mystics-api           │ default     │ N/A     │ fork    │ 3893514  │ 11m    │ 5    │ online    │ 0%       │ 95.9mb   │ root     │ disabled │
+│ 18 │ mysticscivil-api      │ default     │ N/A     │ fork    │ 3763033  │ 3D     │ 1    │ online    │ 0%       │ 233.3mb  │ root     │ disabled │
+│ 11 │ mysticshr-api         │ default     │ 0.0.0   │ fork    │ 3762995  │ 3D     │ 1179 │ online    │ 0%       │ 262.7mb  │ root     │ disabled │
+│ 4  │ people-connect-api    │ default     │ 0.0.0   │ fork    │ 3762956  │ 3D     │ 16   │ online    │ 0%       │ 198.6mb  │ root     │ disabled │
+│ 23 │ solarnexus-api        │ default     │ 0.0.0   │ fork    │ 3763079  │ 3D     │ 1    │ online    │ 0%       │ 131.6mb  │ root     │ disabled │
+│ 6  │ tkprabhu-api          │ default     │ 0.0.0   │ fork    │ 3762992  │ 3D     │ 38   │ online    │ 0%       │ 203.0mb  │ root     │ disabled │
+└────┴───────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2][WARN] Applications ungaludan-sarath not running, starting...
+[PM2] App [ungaludan-sarath] launched (1 instances)
+┌────┬───────────────────────┬─────────────┬─────────┬─────────┬──────────┬────────┬──────┬───────────┬──────────┬──────────┬──────────┬──────────┐
+│ id │ name                  │ namespace   │ version │ mode    │ pid      │ uptime │ ↺    │ status    │ cpu      │ mem      │ user     │ watching │
+├────┼───────────────────────┼─────────────┼─────────┼─────────┼──────────┼────────┼──────┼───────────┼──────────┼──────────┼──────────┼──────────┤
+│ 2  │ automystics-api       │ default     │ 0.0.0   │ fork    │ 3762968  │ 3D     │ 15   │ online    │ 0%       │ 96.0mb   │ root     │ disabled │
+│ 0  │ fitro360              │ default     │ 1.0.0   │ fork    │ 3762940  │ 3D     │ 15   │ online    │ 0%       │ 116.6mb  │ root     │ disabled │
+│ 1  │ kalvicore-api         │ default     │ 0.0.0   │ fork    │ 3762941  │ 3D     │ 15   │ online    │ 0%       │ 108.8mb  │ root     │ disabled │
+│ 20 │ mystics-api           │ default     │ N/A     │ fork    │ 3893514  │ 11m    │ 5    │ online    │ 0%       │ 95.9mb   │ root     │ disabled │
+│ 18 │ mysticscivil-api      │ default     │ N/A     │ fork    │ 3763033  │ 3D     │ 1    │ online    │ 0%       │ 233.3mb  │ root     │ disabled │
+│ 11 │ mysticshr-api         │ default     │ 0.0.0   │ fork    │ 3762995  │ 3D     │ 1179 │ online    │ 0%       │ 262.7mb  │ root     │ disabled │
+│ 4  │ people-connect-api    │ default     │ 0.0.0   │ fork    │ 3762956  │ 3D     │ 16   │ online    │ 0%       │ 198.6mb  │ root     │ disabled │
+│ 23 │ solarnexus-api        │ default     │ 0.0.0   │ fork    │ 3763079  │ 3D     │ 1    │ online    │ 0%       │ 131.6mb  │ root     │ disabled │
+│ 6  │ tkprabhu-api          │ default     │ 0.0.0   │ fork    │ 3762992  │ 3D     │ 38   │ online    │ 0%       │ 203.0mb  │ root     │ disabled │
+│ 25 │ ungaludan-sarath      │ default     │ 0.0.0   │ fork    │ 3927889  │ 0s     │ 0    │ online    │ 0%       │ 12.3mb   │ root     │ disabled │
+└────┴───────────────────────┴─────────────┴─────────┴─────────┴──────────┴────────┴──────┴───────────┴──────────┴──────────┴──────────┴──────────┘
+[PM2] Saving current process list...
+[PM2] Successfully saved in /root/.pm2/dump.pm2
+[TAILING] Tailing last 20 lines for [ungaludan-sarath] process (change the value with --lines option)
+/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/logs/api-error.log last 20 lines:
+/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/logs/api-out.log last 20 lines:
+25|ungalud | 2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+25|ungalud | 2026-06-04 19:57:53: [grievances] uploads dir resolved: /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads/grievances (0 file(s) present)
+25|ungalud | 2026-06-04 19:57:53: [grievances] uploads candidates tried (in order): cwd-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads, module-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads
+25|ungalud | 2026-06-04 19:57:53: {"level":30,"time":1780603073903,"pid":3927702,"hostname":"srv1609330","clientDist":"/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/logesh-connect/dist/public","msg":"Serving frontend static build"}
+25|ungalud | 2026-06-04 19:57:53: {"level":50,"time":1780603073904,"pid":3927702,"hostname":"srv1609330","err":{"type":"Error","message":"listen EADDRINUSE: address already in use :::6000","stack":"Error: listen EADDRINUSE: address already in use :::6000\n    at Server.setupListenHandle [as _listen2] (node:net:2008:16)\n    at listenInCluster (node:net:2065:12)\n    at Server.listen (node:net:2170:7)\n    at app2.listen (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+25|ungalud | 2026-06-04 19:57:54: [grievances] uploads dir resolved: /home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads/grievances (0 file(s) present)
+25|ungalud | 2026-06-04 19:57:54: [grievances] uploads candidates tried (in order): cwd-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads, module-uploads=/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/uploads
+25|ungalud | 2026-06-04 19:57:54: {"level":30,"time":1780603074939,"pid":3927762,"hostname":"srv1609330","clientDist":"/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/logesh-connect/dist/public","msg":"Serving frontend static build"}
+25|ungalud | 2026-06-04 19:57:54: {"level":50,"time":1780603074941,"pid":3927762,"hostname":"srv1609330","err":{"type":"Error","message":"listen EADDRINUSE: address already in use :::6000","stack":"Error: listen EADDRINUSE: address already in use :::6000\n    at Server.setupListenHandle [as _listen2] (node:net:2008:16)\n    at listenInCluster (node:net:2065:12)\n    at Server.listen (node:net:2170:7)\n    at app2.listen (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/node_modules/.pnpm/express@5.2.1/node_modules/express/lib/application.js:605:24)\n    at <anonymous> (/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com/artifacts/api-server/src/index.ts:32:5)\n    at ModuleJob.run (node:internal/modules/esm/module_job:439:25)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async node:internal/modules/esm/loader:633:26","code":"EADDRINUSE","errno":-98,"syscall":"listen","address":"::","port":6000},"msg":"Error listening on port"}
+
+root@srv1609330:/home/ungaludansarath/htdocs/ungaludansarath.tamilagavetrikalagam.com# 
